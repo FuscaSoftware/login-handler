@@ -156,8 +156,8 @@ class Oauth_lib
                     $ownerDetails = $provider->getResourceOwner($token);
 
                     // Use these details to create a new profile
-                    printf('Hello %s!', $ownerDetails->getFirstName());
-                    echo "\n";
+//                    printf('Hello %s!', $ownerDetails->getFirstName());
+//                    echo "\n";
                 }
 
             } catch (Exception $e) {
@@ -166,7 +166,7 @@ class Oauth_lib
                 exit('Something went wrong: ' . $e->getMessage());
 
             }
-            if (@$token) {
+            if (0 && @$token) {
                 // Use this to interact with an API on the users behalf
                 echo "\nToken:";
                 echo $token->getToken();
@@ -181,13 +181,17 @@ class Oauth_lib
             }
 
             if (@$token) {
-//                $_SESSION['qlu']['google']['token_obj'] = $token;
+//                $_SESSION['qlu']['google']['token_obj'] = serialize($token);
+                $_SESSION['qlu']['google']['token_ser'] = serialize($token);
+                $_SESSION['qlu']['google']['token_obj'] = $token;
                 $_SESSION['qlu']['google']['token'] = $token->getToken();
                 $_SESSION['qlu']['google']['token_val'] = $token->getValues();
+                $_SESSION['qlu']['google']['expires'] = $token->getExpires();
             }
             if (@$ownerDetails)
                 $_SESSION['qlu']['google']['ownerDetails'] = $ownerDetails->toArray();
         }
+        return ['token' => @$token, 'provider' => @$provider];
     }
 
     public function google_refresh_token() {

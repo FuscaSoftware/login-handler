@@ -16,15 +16,21 @@ trait MY_Controller_Output
      * @param string $view path to view e.g. index_view or cms/content/index_view
      * @param array  $data
      *
+     * @param bool   $return
+     *
      * @return string the parsed content of the view (no echo/output!)
      */
-    public function get_view(string $view, $data = null): string {
+    public function get_view(string $view, $data = null, $return = true): string {
         if (is_null($data)) {
             if (is_null(@$this->data))
                 $this->data = [];
             $data = $this->data;
         }
-        return $this->loader()->view($view, $data, true);
+        if ($return)
+            return $this->loader()->view($view, $data, (bool) $return);
+        else
+            $this->loader()->view($view, $data, (bool) $return);
+        return "";
     }
 
     /**

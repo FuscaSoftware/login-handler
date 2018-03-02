@@ -24,7 +24,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |
 */
 //$config['base_url'] = '';
-$config['base_url'] = 'https://qlubill.de/login/';
+$config['base_url'] = 'https://login.qlubill.com/';
 
 /*
 |--------------------------------------------------------------------------

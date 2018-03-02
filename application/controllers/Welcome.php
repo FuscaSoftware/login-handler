@@ -27,6 +27,6 @@ class Welcome extends MY_Controller {
         if (in_array($_SERVER['SERVER_NAME'], ['localhost']))
             $this->load->view('welcome_message');
         else
-            redirect("https://qbill.de/account/login");
+            redirect("https://login.qlubill.com/account/login");
     }
 }

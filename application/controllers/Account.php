@@ -13,16 +13,39 @@ class Account extends MY_Controller
     public $no_overhead = true;
     public $libraries = ['oauth_lib', 'session'];
 
-    public function index($param1 = null) {
-//        var_dump($param1);
-        redirect('account/login');
-    }
-
     public function __construct() {
         parent::__construct();
 //        $this->load->library('oauth_lib');
 //        $this->load->library('session');
 
+    }
+
+    public function index($param1 = null) {
+//        var_dump($param1);
+//        redirect('account/login_form');
+        return $this->login_form();
+    }
+
+    public function login_form() {
+        $data = [
+            'form_url' => site_url('account/login_form'),
+            'google_url' => site_url('account/call_google'),
+        ];
+        $input = $this->input->get_post('login');
+        if ($input) {
+            if (isset($input['google']) && $input['google'] > 0) {
+                redirect($data['google_url']);
+                die;
+            }
+
+        }
+        $body = ci()->get_view('login', $data);
+        if (ci()->is_ajax_request()) {
+            $data_ajax['html']['append']['body'] = trim($body);
+            $this->show_ajax_message($data_ajax);
+        } else {
+            ci()->get_view('layout', ['body' => trim($body)], FALSE);
+        }
     }
 
     public function login() {
@@ -33,6 +56,13 @@ class Account extends MY_Controller
         $_SESSION['calls'] = (int) @$_SESSION['calls'] + 1;
         echo "<pre>";
         echo "<a href='" . site_url('Account/call_google') . '\' target="_blank"> Call Google</a>' . "\n";
+//        \League\OAuth2\Client\Token\AccessToken
+        /** @var \League\OAuth2\Client\Token\AccessToken $token */
+        $token = @$_SESSION['qlu']['google']['token_obj'];
+        if (!is_object($token) || $token->hasExpired())
+            var_dump("token is expired");
+        else
+            var_dump("token is valid");
         var_dump($_SESSION);
 //        var_dump($this->session->userdata('qlu'));
         echo "</pre>";
@@ -54,16 +84,20 @@ class Account extends MY_Controller
             ];
             $_SESSION['oauth2state'] = $state;
         }
-        echo "<pre>";
-        var_dump($_SESSION);
         /** @var Oauth_lib $oauth_lib */
         $oauth_lib = $this->oauth_lib;
         $oauth_lib->config = $this->config->item('oauth')['google'];
         $r = $oauth_lib->google_auth();
-
+        if ($r['token'] && $r['token']->hasExpired() == false) {
+            redirect(site_url('account/login'));
+            die;
+        }
+        echo "<pre>";
         var_dump($_SESSION);
+//        var_dump($_SESSION);
 //        var_dump($_SERVER, $_REQUEST);
         echo "</pre>";
+
     }
 
     public function call_google() {
